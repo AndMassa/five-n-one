@@ -1,39 +1,31 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import fetch from 'isomorphic-fetch'
+import {Link} from 'react-router-dom'
 import { map } from 'ramda'
 
-const li = color => {
-  return (
-    <li key={color.id} style={{ color: color.value }}>
-      {color.name}
-    </li>
+function li (c) {
+  return(
+    <li className="pa1" key={c.id} style={{ color: c.value }}>{c.name}</li>
   )
 }
 
-class Colors extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      colors: []
-    }
-  }
-  
-  componentDidMount() {
-   fetch('http://localhost:5000/colors')
-     .then(res => res.json())
-     .then(colors => this.setState({colors}))
-     .catch(err => ('ERROR!', err))
-  }
+const colors = props => {
 
-  render() {
-    return (
-      <div>
-        <h1>Colors</h1>
-        <ul>{map(li, this.state.colors)}</ul>
-      </div>
-    )
-
-  }
+  return(
+    <div>
+      <h1> List of Colors </h1>
+      <ul>
+      {map(li, props.colors)}
+      </ul>
+    </div>
+  )
 }
 
-export default Colors
+function mapStateToProps(state) {
+  return {colors: state.setColors}
+}
+
+const connector = connect(mapStateToProps)
+
+export default connector(colors)

@@ -1,14 +1,27 @@
 const buzzWordsObj = require('buzzwords')
-const { map, keys, prop } = require('ramda')
+const { map, keys, prop, propOr, append } = require('ramda')
+const bodyParser = require('body-parser')
 const uuid = require('uuid')
 
-const createBuzzWords = k => ({id: uuid.v4(), name: k, value: prop(k, buzzWordsObj)})
+const createBuzzWords = k => ({id: uuid.v4(), name: k, value: null})
 
-const buzzWords = map(createBuzzWords, keys(buzzWordsObj))
+var theWords = map(createBuzzWords, buzzWordsObj)
 
 module.exports = app => {
-
+  app.use(bodyParser.json())
   app.get('/buzzwords', (req, res) => {
-    res.send(buzzWords)
+    res.send(theWords)
+  })
+
+  app.post('/buzzwords', (req, res) => {
+
+    const newBuzzword = propOr(null, 'body', req)
+
+    if (newBuzzword) {
+      theWords = append(createBuzzWords(newBuzzword.name), theWords)
+      res.send({ok: true})
+    } else {
+      res.status(400).send({ok: false})
+    }
   })
 }

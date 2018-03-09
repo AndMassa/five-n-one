@@ -1,37 +1,33 @@
 import React from 'react'
+import {connect} from 'react-redux'
 import fetch from 'isomorphic-fetch'
+import {Link} from 'react-router-dom'
 import { map } from 'ramda'
 
-const li = buzzWords => {
+function li (b) {
   return(
-    <li key={buzzWords.id} style={{ buzzWords: buzzWords.value }}>
-    {buzzWords.value}
-    </li>
+    <li key={b.id}>{b.name}</li>
   )
 }
 
-class BuzzWords extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      buzzWords: []
-    }
-  }
-  componentDidMount() {
-    fetch('http://localhost:5000/buzzwords')
-      .then(res => res.json())
-      .then(buzzWords => this.setState({buzzWords}))
-      .catch(err => ('ERROR!', err))
-  }
-
-  render() {
-    return (
-      <div>
-        <h1>BuzzWords</h1>
-        <ul>{map(li, this.state.buzzWords)}</ul>
-      </div>
-    )
-  }
+const buzzwords = props => {
+  return(
+    <div>
+      <h1> Buzz Words </h1>
+        <Link to="/buzzwords/new">Add New Buzzword</Link>
+        <ul>
+          {map(li, props.buzzwords)}
+        </ul>
+    </div>
+  )
 }
 
-export default BuzzWords
+const mapStateToProps = state => {
+  return({
+    buzzwords: state.setBuzzWords
+  })
+}
+
+const connector = connect(mapStateToProps)
+
+export default connector(buzzwords)

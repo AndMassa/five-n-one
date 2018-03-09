@@ -1,5 +1,5 @@
 const starWarsNames = require('starwars-names')
-const { map, keys, prop } = require('ramda')
+const { map, keys, prop, append } = require('ramda')
 const uuid = require('uuid')
 
 const createStarWars = c => ({
@@ -10,11 +10,16 @@ const createStarWars = c => ({
 
 })
 
-const starWars = map(createStarWars, starWarsNames.all)
+var starWars = map(createStarWars, starWarsNames.all)
 
 module.exports = app => {
 
   app.get('/starwars', (req, res) => {
     res.send(starWars)
+  })
+
+  app.post('/starwars', (req, res) => {
+    starwars = append(createStarWars(req.body.name), starWars)
+    res.send({ok:true})
   })
 }
